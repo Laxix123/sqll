@@ -1,0 +1,17 @@
+DECLARE @Mi_Fecha date
+
+SELECT GETDATE( )
+SELECT @Mi_Fecha = '2025-05-10'
+SELECT @Mi_Fecha 'Mi fecha'
+SELECT DAY(@Mi_Fecha) AS dia;
+
+SELECT DAY(@Mi_Fecha) % 2 ;
+
+-- Determinar a qué trimestre corresponde una fecha--
+
+SELECT DATEPART(quarter ,@Mi_Fecha)'Trimestre'
+SELECT DATEPART("y",@Mi_Fecha) 'Y'
+
+-- Determine si una fecha determinada corresponde a un año bisiesto
+
+SELECT DATEDIFF(day, '2025-05-01', '2036-02-31');
