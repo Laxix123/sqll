@@ -1,11 +1,11 @@
 DECLARE @Mi_Fecha date
 
 SELECT GETDATE( )
-SELECT @Mi_Fecha = '2025-05-10'
+SELECT @Mi_Fecha = '2022-05-10'
 SELECT @Mi_Fecha 'Mi fecha'
 SELECT DAY(@Mi_Fecha) AS dia;
 
-SELECT DAY(@Mi_Fecha) % 2 ;
+SELECT DAY(@Mi_Fecha) % 2 as residuo;
 
 -- Determinar a qué trimestre corresponde una fecha--
 
@@ -14,4 +14,17 @@ SELECT DATEPART("y",@Mi_Fecha) 'Y'
 
 -- Determine si una fecha determinada corresponde a un año bisiesto
 
-SELECT DATEDIFF(day, '2025-05-01', '2036-02-31');
+SELECT Year(@Mi_Fecha)%4 'Bisiesto' 
+
+SELECT DATEDIFF(day, '2023-02-28', '2023-03-01') ' Bisiesto '; 
+
+-- Determinar aproximadamente la cantidad de años entre años de fechas 
+
+SELECT DATEDIFF(Year,'2006-01-01','2025-05-10') AS Cantidad_de_Años;
+
+
+-- Determinar la cantidad de quincenas entre 2 fechas
+
+SELECT DATEDIFF(DAY,'2006-01-01','2025-05-23')/15 AS cantidad_de_quincenas;
+
+
