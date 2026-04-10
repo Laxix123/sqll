@@ -59,6 +59,10 @@ WHERE per.id_estado_civil = e_c.id_estado_civil and e_c.nombre_estado_civil not 
 
 
 
+--cambio de tabla --
+
+
+
 --- Mostrar las peliculas existentes en el VC y su categoria
 
 SELECT pel.nombre_pelicula, cat.nombre_categoria
@@ -88,7 +92,7 @@ WHERE pel.id_pelicula = g_p.id_pelicula
 GROUP BY gen.nombre_genero
 ORDER BY gen.nombre_genero asc
 
---Determinar el nombre y fecha de arriendo de la última película arrendada por película
+--Determinar el nombre y fecha de arriendo de la última película arrendada, por película
 
 SELECT pel.nombre_pelicula, MAX(pr.fecha_prestamo)
 FROM PELICULA pel, COPIA_PELICULA cop, PRESTAMO pr
@@ -97,4 +101,29 @@ WHERE pr.id_pelicula = cop.id_pelicula
 	AND cop.id_pelicula = pel.id_pelicula
 GROUP BY pel.nombre_pelicula 
 
+--Determinar el monto promedio de multas aplicadas, por categoría
+
+SELECT  cat.nombre_categoria, AVG(pr.monto_multa)
+FROM  PRESTAMO pr , COPIA_PELICULA cop , PELICULA pl , CATEGORIA cat
+WHERE   pr.id_pelicula = cop.id_pelicula
+	AND pr.numero_copia = cop.numero_copia
+	AND cop.id_pelicula = pl.id_pelicula
+	AND pl.id_categoria = cat.id_categoria
+GROUP BY  cat.nombre_categoria
+
+
+/*Determinar la cantidad de películas existentes por género, de aquello géneros con más de 2 peliculas
+ordenado Ascendentemente por género*/
+
+SELECT gen.nombre_genero,  COUNT(*)
+FROM  PELICULA pel, GENERO_PELICULA g_p, GENERO gen
+WHERE pel.id_pelicula = g_p.id_pelicula
+	AND g_p.id_genero = gen.id_genero
+GROUP BY gen.nombre_genero
+HAVING COUNT(*) > 2
+ORDER BY gen.nombre_genero asc
+
+
+
 --determine el nombre y fecha de arriendo de la última película arrendada (Tarea)
+
