@@ -127,41 +127,148 @@ GROUP BY gen.nombre_genero
 HAVING	COUNT(*) > 2
 ORDER BY gen.nombre_genero ASC
 
+-- 16-04-2026
 
-/* Determinar la cantidad de películas,'TODO ESPECTADOR' ARRENDADAS Y DEVUELTAS por género, de aquellos géneros
+/* Determinar la cantidad de películas, 'TODO ESPECTADOR' ARRENDADAS Y DEVUELTAS por género, de aquellos géneros
 con más de 2 películas, ordenado ascendentemente por género */
-
 SELECT	gen.nombre_genero, COUNT(*)
-FROM	PELICULA pel, GENERO_PELICULA g_p, GENERO gen, CATEGORIA cat ,COPIA_PELICULA cop, PRESTAMO pre
-WHERE	cat.id_categoria = pel.id_categoria
-	AND pel.id_pelicula  = g_p.id_pelicula
-	AND	g_p.id_genero    = gen.id_genero
-	AND pel.id_pelicula  = cop.id_pelicula
-	AND cop.id_pelicula  = pre.id_pelicula
-	AND cop.numero_copia = pre.numero_copia
-	AND cat.nombre_categoria = 'TODO ESPECTADOR'
-	AND pre.fecha_entrega IS NOT NULL
-GROUP BY gen.nombre_genero 
-HAVING	COUNT(*) >= 2
+FROM	CATEGORIA cat, PELICULA pel, GENERO_PELICULA g_p, GENERO gen,
+		COPIA_PELICULA c_p, PRESTAMO pre
+WHERE	cat.id_categoria	= pel.id_categoria
+	AND pel.id_pelicula		= g_p.id_pelicula
+	AND	g_p.id_genero		= gen.id_genero
+	AND	pel.id_pelicula		= c_p.id_pelicula
+	AND	c_p.id_pelicula		= pre.id_pelicula
+	AND	c_p.numero_copia	= pre.numero_copia
+	AND	cat.nombre_categoria	= 'Todo Espectador'
+	AND	pre.fecha_entrega		IS NOT NULL
+GROUP BY gen.nombre_genero
+HAVING	COUNT(*) > 2
 ORDER BY gen.nombre_genero ASC
 
+-
+--FUNCIONES DE CADENA O STRING
+-- https://learn.microsoft.com/en-us/sql/t-sql/functions/ascii-transact-sql?view=sql-server-ver17
 
+SELECT 'Patricio Salgado                                           '
+SELECT TRIM('Patricio Salgado                                           ')
 
-SELECT TRIM ('patricio salgado')
+-- Mostrar los clientes del VC, y la cantidad de caracteres que tiene su nombre
+SELECT	cli.nombre_cliente, LEN(cli.nombre_cliente)
+FROM	CLIENTE cli
 
---mostrar los clientes del VC, y la cantidad de caracteres que tiene su nombre 
+-- Mostrar los clientes cuyo nombre termina con la letra 'a'
+SELECT	cli.nombre_cliente
+FROM	CLIENTE cli
+WHERE	RTRIM(cli.nombre_cliente)	like '%a'
 
-SELECT cl.nombre_cliente ,LEN( cl.nombre_cliente)
-FROM CLIENTE cl
-
--- Mostrar los clientes cuyos nombres termina con la letra 'a'
-
-SELECT cl.nombre_cliente
-FROM CLIENTE cl
-WHERE TRIM(cl.nombre_cliente) LIKE '%a'
-
-/* Mostrar los clientes que en su nombre contienen la letra 'Y' , 
+/*  Mostrar los clientes que en su nombre contienen la letra 'Y', 
 y reemplazarla por 'LL' */
+SELECT	cli.nombre_cliente, REPLACE(cli.nombre_cliente, 'y', 'll')
+FROM	CLIENTE cli
+WHERE	RTRIM(cli.nombre_cliente)	like '%y%'
+
+-- 17-04-2026
+-- PRUEBA 1
+
+-- 23-04-2026
+
+-- Mostrar el segundo nombre del cliente con rut '3-k'
+
+/* Tarea: A partir del nombre y la dirección del cliente, generar el correo institucional (ucsh.cl). 
+Ej: Condoritocasa1@ucsh.cl */
+
+-- FUNCIONES MATEMÁTICAS
+-- https://learn.microsoft.com/en-us/sql/t-sql/functions/abs-transact-sql?view=sql-server-ver17
+
+-- Determinar el área de un circunferencia de radio 3
+SELECT	PI()*3*3
+SELECT	PI()*POWER(3, 2)
+SELECT	PI()*SQUARE(3)
+
+-- Determinar el largo de la hipotenusa de un triangulo rectángulo de lados 3 y 4.
+
+SELECT	SQRT(SQUARE(3) + SQUARE(4))
+SELECT	POWER(SQUARE(3) + SQUARE(4), 0.5)
+
+-- Determinar el valor del iva a pagar de un artículo con precio neto de $2471
+SELECT ROUND(2471*0.19, 0)
+
+-- 24-04-2026
+
+-- Tarea: Determinar el ajuste de sencillo para un pago en efectivo de $2003
+SELECT ROUND(2008, -1)
+
+--FUNCIONES FECHA
+-- Determinar la fecha y hora actual
+SELECT SYSDATETIME(), GETDATE()
+
+--Determinar el número del día
+SELECT DATEPART(day, getdate())
+SELECT DAY(GETDATE())
+
+-- Cómo determinar el nombre del día (2 FORMAS)
+SELECT	DATENAME(DW, GETDATE())
+
+-- 30-04-2026
+--Determinar la fecha que será en 47 días más
+
+SELECT DATEADD(day,47,GETDATE())
+
+--Determinar que fue hace 23 días
+
+SELECT DATEADD(day,-23,GETDATE())
+
+--Determinar qué fecha será en 3 meses
+
+SELECT DATEADD(MONTH,3,GETDATE())
+
+--Determinar la edad aproximada (en años) de una persona que nacio el 14-05-1999
+
+SELECT DATEDIFF(YEAR,'1999-05-14',GETDATE())
+
+SELECT DATEDIFF(YY,GETDATE(),'1999-05-14')
+
+SELECT DATEDIFF(YYYY,GETDATE(),'1999-05-14')
+
+SELECT DATEDIFF(DD,'1999-05-14',GETDATE())/ 365
+
+SELECT year(GETDATE()) - year(('1999-05-14'))
+
+--Determinar si la fecha '18-09-2026' es una fecha real
+
+SELECT ISDATE ( '18-09.2026' )
+
+--Determinar la edad aproximada en años, de cada uno de los clientes del VC
+
+SELECT cli.nombre_cliente,DATEDIFF(YEAR,cli.fecha_nacimiento_cliente,GETDATE())
+FROM CLIENTE cli
+
+-- Determinar la cantidad de películas entregadas atrasadas 
+
+SELECT  COUNT(*) 'cantidad'
+FROM PELICULA pl , COPIA_PELICULA cp , PRESTAMO pr
+WHERE pl.id_pelicula = cp.id_pelicula
+ AND  cp.id_pelicula = pr.id_pelicula
+ AND  cp.numero_copia = pr.numero_copia
+ AND	pr.fecha_entrega > pr.fecha_devolucion
+
+
+-- Determinar la cantidad de días de atraso que tienen las películas no entregadas, identificando el cliente y la película 
+
+SELECT cli.nombre_cliente , pl.nombre_pelicula ,COUNT(*) 'cantidad'
+FROM    PELICULA pl , COPIA_PELICULA cp ,PRESTAMO pr, CLIENTE cli
+WHERE  cli.rut_cliente = pr.rut_cliente
+ AND   pr.id_pelicula = cp.id_pelicula
+ AND   pr.numero_copia = cp.numero_copia
+ AND   cp.id_pelicula = pl.id_pelicula
+ AND   pr.fecha_entrega is null
+ GROUP BY cli.nombre_cliente , pl.nombre_pelicula 
+
+
+-- Determinar el monto a pagar de lso arriendos vigentes atrasados, identificando el cliente y la pelicula
+
+
 
 SELECT cl.nombre_cliente, REPLACE(cl.nombre_cliente,'y','LL')
 FROM CLIENTE cl
